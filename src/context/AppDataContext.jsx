@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 const AppDataContext = createContext();
 
@@ -54,24 +56,110 @@ export const AppDataProvider = ({ children }) => {
     }
   ];
 
-  const [ingredients, setIngredients] = useState(() => {
-    const saved = localStorage.getItem('potions_ingredients');
-    return mergeDefaultIngredients(saved);
-  });
+  const [ingredients, setIngredients] = useState([]);
+  const [potions, setPotions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [categoryOrder, setCategoryOrder] = useState([]);
 
-  const [potions, setPotions] = useState(() => {
-    const saved = localStorage.getItem('potions_potions');
-    return saved ? JSON.parse(saved) : defaultPotions;
-  });
-
-  // Save to local storage whenever they change
+  // Initialize Firestore data on mount
   useEffect(() => {
-    localStorage.setItem('potions_ingredients', JSON.stringify(ingredients));
+    const initFirestore = async () => {
+      try {
+        const dataRef = doc(db, 'data', 'appData');
+        const dataSnap = await getDoc(dataRef);
+
+        if (!dataSnap.exists()) {
+          // First time - create initial data
+          const initialData = {
+            ingredients: defaultIngredients,
+            potions: defaultPotions,
+            categories: ['ขั้นสูง'],
+            categoryOrder: ['ขั้นสูง']
+          };
+          await setDoc(dataRef, initialData);
+          setIngredients(defaultIngredients);
+          setPotions(defaultPotions);
+          setCategories(['ขั้นสูง']);
+          setCategoryOrder(['ขั้นสูง']);
+        } else {
+          // Load existing data
+          setIngredients(dataSnap.data().ingredients || defaultIngredients);
+          setPotions(dataSnap.data().potions || defaultPotions);
+          setCategories(dataSnap.data().categories || ['ขั้นสูง']);
+          setCategoryOrder(dataSnap.data().categoryOrder || ['ขั้นสูง']);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error initializing Firestore:', error);
+        setIsLoading(false);
+      }
+    };
+
+    initFirestore();
+
+    // Listen for real-time changes
+    const unsubscribe = onSnapshot(doc(db, 'data', 'appData'), (doc) => {
+      if (doc.exists()) {
+        setIngredients(doc.data().ingredients || defaultIngredients);
+        setPotions(doc.data().potions || defaultPotions);
+        setCategories(doc.data().categories || ['ขั้นสูง']);
+        setCategoryOrder(doc.data().categoryOrder || ['ขั้นสูง']);
+      }
+    }, (error) => {
+      console.error('Error listening to Firestore:', error);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Save ingredients to Firestore whenever they change
+  useEffect(() => {
+    if (ingredients.length === 0 && isLoading) return;
+    
+    const updateData = async () => {
+      try {
+        const dataRef = doc(db, 'data', 'appData');
+        await setDoc(dataRef, { ingredients, potions }, { merge: true });
+      } catch (error) {
+        console.error('Error updating ingredients in Firestore:', error);
+      }
+    };
+
+    updateData();
   }, [ingredients]);
 
+  // Save potions to Firestore whenever they change
   useEffect(() => {
-    localStorage.setItem('potions_potions', JSON.stringify(potions));
+    if (potions.length === 0 && isLoading) return;
+    
+    const updateData = async () => {
+      try {
+        const dataRef = doc(db, 'data', 'appData');
+        await setDoc(dataRef, { ingredients, potions }, { merge: true });
+      } catch (error) {
+        console.error('Error updating potions in Firestore:', error);
+      }
+    };
+
+    updateData();
   }, [potions]);
+
+  // Save categories to Firestore whenever they change
+  useEffect(() => {
+    if (categoryOrder.length === 0 && isLoading) return;
+    
+    const updateData = async () => {
+      try {
+        const dataRef = doc(db, 'data', 'appData');
+        await setDoc(dataRef, { categories, categoryOrder }, { merge: true });
+      } catch (error) {
+        console.error('Error updating categories in Firestore:', error);
+      }
+    };
+
+    updateData();
+  }, [categories, categoryOrder]);
 
   // Currency Utils
   // 1 Galleon = 17 Sickles
@@ -109,7 +197,10 @@ export const AppDataProvider = ({ children }) => {
       ingredients, setIngredients,
       potions, setPotions,
       toTotalKnuts, toCurrencyObj,
-      calculatePotionCost
+      calculatePotionCost,
+      isLoading,
+      categories, setCategories,
+      categoryOrder, setCategoryOrder
     }}>
       {children}
     </AppDataContext.Provider>

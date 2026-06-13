@@ -1,35 +1,24 @@
 import React, { useMemo, useState } from 'react';
+import CategoryTabs from './CategoryTabs';
+import { useAppData } from '../context/AppDataContext';
 
 const PotionSelector = ({ potions, value, onChange, style }) => {
-  const [search, setSearch] = useState('');
+  const { categoryOrder } = useAppData();
+  const [selectedCategory, setSelectedCategory] = useState(categoryOrder[0] || '');
 
   const filteredPotions = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return potions;
-
-    return potions.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.category?.toLowerCase().includes(query)
-    );
-  }, [potions, search]);
-
-  const displayPotions = useMemo(() => {
-    if (!value) return filteredPotions;
-    const selected = potions.find(p => p.id === value);
-    if (!selected || filteredPotions.some(p => p.id === value)) return filteredPotions;
-    return [selected, ...filteredPotions];
-  }, [potions, filteredPotions, value]);
+    if (!selectedCategory) return potions;
+    return potions.filter(p => p.category === selectedCategory);
+  }, [potions, selectedCategory]);
 
   return (
     <div style={style}>
-      <input
-        type="text"
-        className="input-field"
-        placeholder="ค้นหาสูตรยา..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ width: '100%', marginBottom: '10px' }}
+      <CategoryTabs
+        categories={categoryOrder}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
       />
+      
       <select
         className="input-field"
         value={value}
@@ -37,13 +26,14 @@ const PotionSelector = ({ potions, value, onChange, style }) => {
         style={{ width: '100%' }}
       >
         <option value="">-- เลือกสูตรยา --</option>
-        {displayPotions.map(p => (
+        {filteredPotions.map(p => (
           <option key={p.id} value={p.id}>{p.name}</option>
         ))}
       </select>
-      {search && displayPotions.length === 0 && (
+
+      {filteredPotions.length === 0 && selectedCategory && (
         <p style={{ marginTop: '8px', fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-          ไม่พบสูตรยาที่ตรงกับ "{search}"
+          ไม่มีสูตรยาในหมวดหมู่ "{selectedCategory}"
         </p>
       )}
     </div>

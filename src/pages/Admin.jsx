@@ -3,7 +3,7 @@ import { useAppData } from '../context/AppDataContext';
 import NumberSliderInput, { parseNumber } from '../components/NumberSliderInput';
 
 const Admin = () => {
-  const { ingredients, setIngredients, potions, setPotions } = useAppData();
+  const { ingredients, setIngredients, potions, setPotions, categories, setCategories, categoryOrder, setCategoryOrder } = useAppData();
 
   const [ingName, setIngName] = useState('');
   const [ingGalleon, setIngGalleon] = useState('');
@@ -19,6 +19,8 @@ const Admin = () => {
   const [tempIngId, setTempIngId] = useState('');
   const [tempIngQty, setTempIngQty] = useState('');
   const [editingPotionId, setEditingPotionId] = useState(null);
+
+  const [newCategory, setNewCategory] = useState('');
 
   const resetIngredientForm = () => {
     setEditingIngredientId(null);
@@ -118,11 +120,97 @@ const Admin = () => {
     setPotions(potions.filter(p => p.id !== id));
   };
 
+  // Category management
+  const addCategory = () => {
+    if (!newCategory.trim()) return;
+    if (!categoryOrder.includes(newCategory)) {
+      setCategoryOrder([...categoryOrder, newCategory]);
+      setNewCategory('');
+    }
+  };
+
+  const removeCategory = (category) => {
+    setCategoryOrder(categoryOrder.filter(c => c !== category));
+  };
+
+  const moveCategory = (index, direction) => {
+    const newOrder = [...categoryOrder];
+    if (direction === 'up' && index > 0) {
+      [newOrder[index], newOrder[index - 1]] = [newOrder[index - 1], newOrder[index]];
+    } else if (direction === 'down' && index < newOrder.length - 1) {
+      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+    }
+    setCategoryOrder(newOrder);
+  };
+
   return (
     <div style={{ paddingTop: '20px', paddingBottom: '40px' }}>
       <h2 className="text-gradient" style={{ marginBottom: '30px' }}>Admin Dashboard</h2>
       
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        {/* Category Management */}
+        <div style={{ flex: '1 1 300px' }}>
+          <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
+            <h3 style={{ color: 'var(--color-accent-secondary)', marginBottom: '15px' }}>จัดการหมวดหมู่</h3>
+            
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '15px' }}>
+              <input
+                type="text"
+                className="input-field"
+                placeholder="ชื่อหมวดหมู่ใหม่"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && addCategory()}
+                style={{ flex: 1 }}
+              />
+              <button type="button" className="btn btn-primary" onClick={addCategory}>เพิ่ม</button>
+            </div>
+
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {categoryOrder.map((cat, idx) => (
+                <li 
+                  key={idx} 
+                  style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.05)',
+                    marginBottom: '5px',
+                    borderRadius: '4px'
+                  }}
+                >
+                  <span style={{ fontSize: '14px' }}>{cat}</span>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    <button 
+                      type="button" 
+                      onClick={() => moveCategory(idx, 'up')}
+                      disabled={idx === 0}
+                      style={{ background: 'none', border: 'none', color: 'var(--color-accent-gold)', cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.5 : 1, padding: '4px' }}
+                    >
+                      <i className='bx bx-chevron-up'></i>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => moveCategory(idx, 'down')}
+                      disabled={idx === categoryOrder.length - 1}
+                      style={{ background: 'none', border: 'none', color: 'var(--color-accent-gold)', cursor: idx === categoryOrder.length - 1 ? 'not-allowed' : 'pointer', opacity: idx === categoryOrder.length - 1 ? 0.5 : 1, padding: '4px' }}
+                    >
+                      <i className='bx bx-chevron-down'></i>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => removeCategory(cat)}
+                      style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', padding: '4px' }}
+                    >
+                      <i className='bx bx-trash'></i>
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
         {/* Ingredients Management */}
         <div style={{ flex: '1 1 400px' }}>
           <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
