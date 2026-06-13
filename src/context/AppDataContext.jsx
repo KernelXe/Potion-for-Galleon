@@ -11,7 +11,23 @@ export const AppDataProvider = ({ children }) => {
     { id: 'i2', name: 'เขาไบคอร์น', price: { galleon: 1, sickle: 0, knut: 0 } },
     { id: 'i3', name: 'แมลงวันลูกไม้', price: { galleon: 0, sickle: 0, knut: 15 } },
     { id: 'i4', name: 'ปลิง', price: { galleon: 0, sickle: 1, knut: 0 } },
+    { id: 'i5', name: 'เลือดซาลาแมนเดอร์', price: { galleon: 0, sickle: 0, knut: 0 } },
+    { id: 'i6', name: 'ผงกระดูกสันหลังปลาสิงโต', price: { galleon: 0, sickle: 0, knut: 0 } },
+    { id: 'i7', name: 'เมือกหนอนฟลอบเบอร์', price: { galleon: 0, sickle: 0, knut: 0 } },
+    { id: 'i8', name: 'น้ำผึ้ง', price: { galleon: 0, sickle: 0, knut: 0 } },
+    { id: 'i9', name: 'น้ำบูมเบอร์รี่', price: { galleon: 0, sickle: 0, knut: 0 } },
   ];
+
+  const mergeDefaultIngredients = (saved) => {
+    if (!saved) return defaultIngredients;
+    const parsed = JSON.parse(saved);
+    const existingIds = new Set(parsed.map(i => i.id));
+    const existingNames = new Set(parsed.map(i => i.name));
+    const missing = defaultIngredients.filter(
+      d => !existingIds.has(d.id) && !existingNames.has(d.name)
+    );
+    return missing.length ? [...parsed, ...missing] : parsed;
+  };
 
   const defaultPotions = [
     {
@@ -40,7 +56,7 @@ export const AppDataProvider = ({ children }) => {
 
   const [ingredients, setIngredients] = useState(() => {
     const saved = localStorage.getItem('potions_ingredients');
-    return saved ? JSON.parse(saved) : defaultIngredients;
+    return mergeDefaultIngredients(saved);
   });
 
   const [potions, setPotions] = useState(() => {

@@ -17,12 +17,19 @@ function App() {
           </span>
         </Link>
       </nav>
-      <main className="container" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <main className="container app-main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
+      <footer className="site-footer">
+        <div className="container site-footer__inner">
+          <p className="site-footer__text">
+            © 2026 <span className="site-footer__author">Kernelxz</span>. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
