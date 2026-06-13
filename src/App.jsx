@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link, NavLink } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 
@@ -16,13 +16,6 @@ function App() {
             <span className="navbar-brand__tagline">Recipes & Material Calculator</span>
           </span>
         </Link>
-        <NavLink
-          to="/admin"
-          className={({ isActive }) => `navbar-action${isActive ? ' navbar-action--active' : ''}`}
-          title="Admin Dashboard"
-        >
-          <i className="bx bx-cog"></i>
-        </NavLink>
       </nav>
       <main className="container" style={{ minHeight: 'calc(100vh - 64px)' }}>
         <Routes>

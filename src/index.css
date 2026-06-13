@@ -247,39 +247,6 @@ a:hover {
   font-weight: 400;
 }
 
-.navbar-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  color: var(--color-text-secondary);
-  background: rgba(155, 126, 222, 0.06);
-  border: 1px solid rgba(155, 126, 222, 0.12);
-  transition: var(--transition-smooth);
-  text-decoration: none;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.navbar-action .bx {
-  font-size: 22px;
-  color: inherit;
-}
-
-.navbar-action:hover {
-  color: var(--color-accent-gold);
-  background: rgba(212, 175, 55, 0.1);
-  border-color: rgba(212, 175, 55, 0.25);
-}
-
-.navbar-action--active {
-  color: var(--color-accent-gold);
-  background: rgba(155, 126, 222, 0.14);
-  border-color: rgba(212, 175, 55, 0.3);
-}
-
 @media (max-width: 480px) {
   .navbar {
     padding: 10px 16px;

@@ -6,10 +6,10 @@ const Admin = () => {
   const { ingredients, setIngredients, potions, setPotions } = useAppData();
 
   const [ingName, setIngName] = useState('');
-  const [ingImage, setIngImage] = useState('');
   const [ingGalleon, setIngGalleon] = useState('');
   const [ingSickle, setIngSickle] = useState('');
   const [ingKnut, setIngKnut] = useState('');
+  const [editingIngredientId, setEditingIngredientId] = useState(null);
 
   const [potName, setPotName] = useState('');
   const [potCategory, setPotCategory] = useState('');
@@ -20,25 +20,44 @@ const Admin = () => {
   const [tempIngQty, setTempIngQty] = useState('');
   const [editingPotionId, setEditingPotionId] = useState(null);
 
-  const addIngredient = (e) => {
+  const resetIngredientForm = () => {
+    setEditingIngredientId(null);
+    setIngName('');
+    setIngGalleon('');
+    setIngSickle('');
+    setIngKnut('');
+  };
+
+  const handleEditIngredient = (ing) => {
+    setEditingIngredientId(ing.id);
+    setIngName(ing.name);
+    setIngGalleon(String(ing.price.galleon));
+    setIngSickle(String(ing.price.sickle));
+    setIngKnut(String(ing.price.knut));
+  };
+
+  const saveIngredient = (e) => {
     e.preventDefault();
     if (!ingName) return;
-    const newIng = {
-      id: `i${Date.now()}`,
-      name: ingName,
-      price: {
-        galleon: parseNumber(ingGalleon, 0),
-        sickle: parseNumber(ingSickle, 0),
-        knut: parseNumber(ingKnut, 0),
-      },
-      image: ingImage
+
+    const price = {
+      galleon: parseNumber(ingGalleon, 0),
+      sickle: parseNumber(ingSickle, 0),
+      knut: parseNumber(ingKnut, 0),
     };
-    setIngredients([...ingredients, newIng]);
-    setIngName(''); setIngImage(''); setIngGalleon(''); setIngSickle(''); setIngKnut('');
+
+    if (editingIngredientId) {
+      setIngredients(ingredients.map(i => i.id === editingIngredientId ? { ...i, name: ingName, price } : i));
+    } else {
+      setIngredients([...ingredients, { id: `i${Date.now()}`, name: ingName, price }]);
+    }
+
+    resetIngredientForm();
   };
 
   const removeIngredient = (id) => {
     setIngredients(ingredients.filter(i => i.id !== id));
+    if (editingIngredientId === id) resetIngredientForm();
   };
 
   const addPotionIng = () => {
@@ -101,19 +120,18 @@ const Admin = () => {
 
   return (
     <div style={{ paddingTop: '20px', paddingBottom: '40px' }}>
-      <h2 className="text-gradient" style={{ marginBottom: '30px' }}><i className='bx bx-cog'></i> Admin Dashboard</h2>
+      <h2 className="text-gradient" style={{ marginBottom: '30px' }}>Admin Dashboard</h2>
       
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
         {/* Ingredients Management */}
         <div style={{ flex: '1 1 400px' }}>
           <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
-            <h3 style={{ color: 'var(--color-accent-secondary)', marginBottom: '15px' }}>Add Ingredient</h3>
-            <form onSubmit={addIngredient}>
+            <h3 style={{ color: 'var(--color-accent-secondary)', marginBottom: '15px' }}>
+              {editingIngredientId ? 'Edit Ingredient' : 'Add Ingredient'}
+            </h3>
+            <form onSubmit={saveIngredient}>
               <div style={{ marginBottom: '10px' }}>
                 <input type="text" className="input-field" placeholder="ชื่อส่วนผสม" value={ingName} onChange={(e) => setIngName(e.target.value)} required />
-              </div>
-              <div style={{ marginBottom: '10px' }}>
-                <input type="text" className="input-field" placeholder="รูปภาพ URL (เว้นว่างได้)" value={ingImage} onChange={(e) => setIngImage(e.target.value)} />
               </div>
               <div className="price-inputs">
                 <div className="form-field">
@@ -129,7 +147,14 @@ const Admin = () => {
                   <NumberSliderInput value={ingKnut} onChange={setIngKnut} min={0} placeholder="0" />
                 </div>
               </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>เพิ่มส่วนผสม</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                  {editingIngredientId ? 'บันทึกการแก้ไข' : 'เพิ่มส่วนผสม'}
+                </button>
+                {editingIngredientId && (
+                  <button type="button" className="btn btn-outline" onClick={resetIngredientForm}>ยกเลิก</button>
+                )}
+              </div>
             </form>
           </div>
 
@@ -139,7 +164,10 @@ const Admin = () => {
               {ingredients.map(ing => (
                 <li key={ing.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', marginBottom: '5px', borderRadius: '4px' }}>
                   <span>{ing.name} <small style={{color:'var(--color-text-secondary)'}}>({ing.price.galleon}G {ing.price.sickle}S {ing.price.knut}K)</small></span>
-                  <button onClick={() => removeIngredient(ing.id)} className="btn" style={{ color: '#ff4d4d', padding: '4px' }}><i className='bx bx-trash'></i></button>
+                  <div>
+                    <button onClick={() => handleEditIngredient(ing)} className="btn" style={{ color: 'var(--color-accent-gold)', padding: '4px' }}><i className='bx bx-edit'></i></button>
+                    <button onClick={() => removeIngredient(ing.id)} className="btn" style={{ color: '#ff4d4d', padding: '4px' }}><i className='bx bx-trash'></i></button>
+                  </div>
                 </li>
               ))}
             </ul>

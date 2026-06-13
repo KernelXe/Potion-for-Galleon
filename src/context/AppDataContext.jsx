@@ -7,10 +7,10 @@ export const useAppData = () => useContext(AppDataContext);
 export const AppDataProvider = ({ children }) => {
   // Default mock data
   const defaultIngredients = [
-    { id: 'i1', name: 'คราบงูบูมสแลง', price: { galleon: 0, sickle: 2, knut: 10 }, image: '' },
-    { id: 'i2', name: 'เขาไบคอร์น', price: { galleon: 1, sickle: 0, knut: 0 }, image: '' },
-    { id: 'i3', name: 'แมลงวันลูกไม้', price: { galleon: 0, sickle: 0, knut: 15 }, image: '' },
-    { id: 'i4', name: 'ปลิง', price: { galleon: 0, sickle: 1, knut: 0 }, image: '' },
+    { id: 'i1', name: 'คราบงูบูมสแลง', price: { galleon: 0, sickle: 2, knut: 10 } },
+    { id: 'i2', name: 'เขาไบคอร์น', price: { galleon: 1, sickle: 0, knut: 0 } },
+    { id: 'i3', name: 'แมลงวันลูกไม้', price: { galleon: 0, sickle: 0, knut: 15 } },
+    { id: 'i4', name: 'ปลิง', price: { galleon: 0, sickle: 1, knut: 0 } },
   ];
 
   const defaultPotions = [
