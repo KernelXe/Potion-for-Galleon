@@ -59,13 +59,6 @@ const Home = () => {
   const [selectedPotionId, setSelectedPotionId] = useState('');
   const selectedPotion = potions.find((p) => p.id === selectedPotionId);
 
-  const handleBackToTop = () => {
-    setSelectedPotionId('');
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
   return (
     <div className="flex flex-col gap-6 pb-12 pt-2">
       <div className="flex items-center justify-end">
@@ -112,7 +105,7 @@ const Home = () => {
                 <i className="bx bx-book-bookmark text-primary" /> All Potion Recipes
               </h3>
               {selectedPotion ? (
-                <PotionCard potion={selectedPotion} onBack={handleBackToTop} />
+                <PotionCard potion={selectedPotion} />
               ) : (
                 <EmptyState />
               )}

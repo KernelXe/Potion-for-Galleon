@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-const PotionCard = ({ potion, onBack }) => {
+const PotionCard = ({ potion }) => {
   const { calculatePotionCost, ingredients } = useAppData();
   const cost = calculatePotionCost(potion);
 
@@ -58,7 +58,7 @@ const PotionCard = ({ potion, onBack }) => {
         <Separator className="my-5" />
 
         <h4 className="mb-2 text-primary">Brewing Steps</h4>
-        <RecipeViewer steps={potion.steps} onBack={onBack} />
+        <RecipeViewer steps={potion.steps} />
       </CardContent>
     </Card>
   );
