@@ -1,4 +1,6 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 export const parseNumber = (value, fallback = 0) => {
   if (value === '' || value === null || value === undefined) return fallback;
@@ -26,16 +28,10 @@ const NumberSliderInput = ({
     }
   };
 
-  const classes = [
-    'number-input',
-    narrow && 'number-input--narrow',
-    className,
-  ].filter(Boolean).join(' ');
-
   return (
-    <input
+    <Input
       type="number"
-      className={`input-field ${classes}`}
+      className={cn('number-input', narrow && 'w-24', className)}
       value={value}
       onChange={handleInputChange}
       placeholder={placeholder}

@@ -1,47 +1,35 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 const CategoryTabs = ({ categories, selectedCategory, onSelectCategory }) => {
   if (!categories || categories.length === 0) {
-    return <p style={{ color: 'var(--color-text-secondary)' }}>ไม่มีหมวดหมู่</p>;
+    return <p className="text-sm text-muted-foreground">ไม่มีหมวดหมู่</p>;
   }
 
   return (
-    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
-      {categories.map(category => (
-        <button
-          key={category}
-          onClick={() => onSelectCategory(category)}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: selectedCategory === category 
-              ? '2px solid var(--color-accent-primary)' 
-              : '1px solid var(--color-border)',
-            background: selectedCategory === category 
-              ? 'rgba(108, 92, 231, 0.2)' 
-              : 'transparent',
-            color: selectedCategory === category
-              ? 'var(--color-accent-primary)'
-              : 'var(--color-text-secondary)',
-            cursor: 'pointer',
-            fontWeight: selectedCategory === category ? '600' : '500',
-            transition: 'all 0.2s',
-            fontSize: '14px'
-          }}
-          onMouseEnter={(e) => {
-            if (selectedCategory !== category) {
-              e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (selectedCategory !== category) {
-              e.currentTarget.style.background = 'transparent';
-            }
-          }}
-        >
-          {category}
-        </button>
-      ))}
+    <div className="flex flex-wrap gap-1.5">
+      {categories.map((category) => {
+        const isActive = selectedCategory === category;
+
+        return (
+          <button
+            key={category}
+            type="button"
+            onClick={() => onSelectCategory(category)}
+            className={cn(
+              'group relative rounded-full border px-4 py-1.5 transition-all duration-200',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+              isActive
+                ? 'border-gold/50 bg-gold/[0.06] text-gold shadow-[inset_0_0_0_1px_oklch(0.76_0.12_85/0.18)]'
+                : 'border-border/40 text-muted-foreground hover:border-border hover:text-foreground'
+            )}
+          >
+            <span className="font-heading text-xs font-medium tracking-wider sm:text-[13px]">
+              {category}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };
