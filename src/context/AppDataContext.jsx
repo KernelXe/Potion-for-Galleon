@@ -1,12 +1,15 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { db } from '../firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 
 const AppDataContext = createContext();
 
 export const useAppData = () => useContext(AppDataContext);
 
-export const AppDataProvider = ({ children }) => {
+// serverId เลือกว่าจะอ่าน/เขียนข้อมูลของเซิฟไหนใน Firestore
+// เอกสารแต่ละเซิฟจะแยกกันเด็ดขาดที่ collection "data" โดยใช้ serverId เป็น document id
+// เช่น data/mooncraft, data/hogwarts
+export const AppDataProvider = ({ serverId, children }) => {
   // Default mock data
   const defaultIngredients = [
     { id: 'i1', name: 'คราบงูบูมสแลง', price: { galleon: 0, sickle: 2, knut: 10 } },
@@ -19,17 +22,6 @@ export const AppDataProvider = ({ children }) => {
     { id: 'i8', name: 'น้ำผึ้ง', price: { galleon: 0, sickle: 0, knut: 0 } },
     { id: 'i9', name: 'น้ำบูมเบอร์รี่', price: { galleon: 0, sickle: 0, knut: 0 } },
   ];
-
-  const mergeDefaultIngredients = (saved) => {
-    if (!saved) return defaultIngredients;
-    const parsed = JSON.parse(saved);
-    const existingIds = new Set(parsed.map(i => i.id));
-    const existingNames = new Set(parsed.map(i => i.name));
-    const missing = defaultIngredients.filter(
-      d => !existingIds.has(d.id) && !existingNames.has(d.name)
-    );
-    return missing.length ? [...parsed, ...missing] : parsed;
-  };
 
   const defaultPotions = [
     {
@@ -62,15 +54,37 @@ export const AppDataProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [categoryOrder, setCategoryOrder] = useState([]);
 
-  // Initialize Firestore data on mount
+  // ref เหล่านี้ไม่ทำให้ re-render (ต่างจาก state) เลยใช้เป็น "flag" คุมจังหวะได้แม่นกว่า
+  // hasLoadedRef -> โหลดข้อมูลของเซิฟปัจจุบันเสร็จหรือยัง (กันการเขียนทับก่อนโหลดเสร็จ)
+  // skip*SaveRef -> การเปลี่ยนแปลง state ครั้งนี้มาจาก Firestore เอง (โหลดครั้งแรก/realtime update)
+  //                 ไม่ใช่จากผู้ใช้แก้ไข จึงไม่ต้องเขียนกลับไปอีกรอบ (กัน loop และกันเขียนทับข้อมูลคนอื่น)
+  const hasLoadedRef = useRef(false);
+  const skipIngredientsSaveRef = useRef(false);
+  const skipPotionsSaveRef = useRef(false);
+  const skipCategoriesSaveRef = useRef(false);
+
+  // โหลดข้อมูล + subscribe realtime ของเซิฟที่เลือกอยู่
   useEffect(() => {
-    const initFirestore = async () => {
+    if (!serverId) return;
+
+    const dataRef = doc(db, 'data', serverId);
+
+    const applyRemoteData = (data) => {
+      skipIngredientsSaveRef.current = true;
+      skipPotionsSaveRef.current = true;
+      skipCategoriesSaveRef.current = true;
+      setIngredients(data.ingredients || defaultIngredients);
+      setPotions(data.potions || defaultPotions);
+      setCategories(data.categories || ['ขั้นสูง']);
+      setCategoryOrder(data.categoryOrder || ['ขั้นสูง']);
+    };
+
+    const init = async () => {
       try {
-        const dataRef = doc(db, 'data', 'appData');
         const dataSnap = await getDoc(dataRef);
 
         if (!dataSnap.exists()) {
-          // First time - create initial data
+          // เซิฟนี้ยังไม่เคยมีข้อมูล -> สร้างค่าเริ่มต้นให้
           const initialData = {
             ingredients: defaultIngredients,
             potions: defaultPotions,
@@ -78,94 +92,74 @@ export const AppDataProvider = ({ children }) => {
             categoryOrder: ['ขั้นสูง']
           };
           await setDoc(dataRef, initialData);
-          setIngredients(defaultIngredients);
-          setPotions(defaultPotions);
-          setCategories(['ขั้นสูง']);
-          setCategoryOrder(['ขั้นสูง']);
+          applyRemoteData(initialData);
         } else {
-          // Load existing data
-          setIngredients(dataSnap.data().ingredients || defaultIngredients);
-          setPotions(dataSnap.data().potions || defaultPotions);
-          setCategories(dataSnap.data().categories || ['ขั้นสูง']);
-          setCategoryOrder(dataSnap.data().categoryOrder || ['ขั้นสูง']);
+          applyRemoteData(dataSnap.data());
         }
-        setIsLoading(false);
       } catch (error) {
         console.error('Error initializing Firestore:', error);
+      } finally {
+        hasLoadedRef.current = true;
         setIsLoading(false);
       }
     };
 
-    initFirestore();
+    init();
 
-    // Listen for real-time changes
-    const unsubscribe = onSnapshot(doc(db, 'data', 'appData'), (doc) => {
-      if (doc.exists()) {
-        setIngredients(doc.data().ingredients || defaultIngredients);
-        setPotions(doc.data().potions || defaultPotions);
-        setCategories(doc.data().categories || ['ขั้นสูง']);
-        setCategoryOrder(doc.data().categoryOrder || ['ขั้นสูง']);
+    // ฟังข้อมูล realtime (รวมถึงการเปลี่ยนแปลงจากเครื่อง/คนอื่น) ของเซิฟนี้
+    const unsubscribe = onSnapshot(dataRef, (snap) => {
+      if (snap.exists()) {
+        applyRemoteData(snap.data());
       }
     }, (error) => {
       console.error('Error listening to Firestore:', error);
     });
 
-    return unsubscribe;
-  }, []);
+    return () => unsubscribe();
+  }, [serverId]);
 
-  // Save ingredients to Firestore whenever they change
+  // บันทึก ingredients กลับ Firestore -- แก้เฉพาะ field "ingredients" เท่านั้น
+  // ไม่แตะ potions/categories ของเซิฟนี้เลย ป้องกันการเขียนทับข้อมูลของคนอื่นที่เพิ่งบันทึกไป
   useEffect(() => {
-    if (ingredients.length === 0 && isLoading) return;
-    
-    const updateData = async () => {
-      try {
-        const dataRef = doc(db, 'data', 'appData');
-        await setDoc(dataRef, { ingredients, potions }, { merge: true });
-      } catch (error) {
-        console.error('Error updating ingredients in Firestore:', error);
-      }
-    };
+    if (!serverId || !hasLoadedRef.current) return;
+    if (skipIngredientsSaveRef.current) {
+      skipIngredientsSaveRef.current = false;
+      return;
+    }
+    updateDoc(doc(db, 'data', serverId), { ingredients }).catch((error) => {
+      console.error('Error updating ingredients in Firestore:', error);
+    });
+  }, [ingredients, serverId]);
 
-    updateData();
-  }, [ingredients]);
-
-  // Save potions to Firestore whenever they change
+  // บันทึก potions กลับ Firestore -- แก้เฉพาะ field "potions" เท่านั้น
   useEffect(() => {
-    if (potions.length === 0 && isLoading) return;
-    
-    const updateData = async () => {
-      try {
-        const dataRef = doc(db, 'data', 'appData');
-        await setDoc(dataRef, { ingredients, potions }, { merge: true });
-      } catch (error) {
-        console.error('Error updating potions in Firestore:', error);
-      }
-    };
+    if (!serverId || !hasLoadedRef.current) return;
+    if (skipPotionsSaveRef.current) {
+      skipPotionsSaveRef.current = false;
+      return;
+    }
+    updateDoc(doc(db, 'data', serverId), { potions }).catch((error) => {
+      console.error('Error updating potions in Firestore:', error);
+    });
+  }, [potions, serverId]);
 
-    updateData();
-  }, [potions]);
-
-  // Save categories to Firestore whenever they change
+  // บันทึก categories/categoryOrder กลับ Firestore -- แก้เฉพาะสอง field นี้เท่านั้น
   useEffect(() => {
-    if (categoryOrder.length === 0 && isLoading) return;
-    
-    const updateData = async () => {
-      try {
-        const dataRef = doc(db, 'data', 'appData');
-        await setDoc(dataRef, { categories, categoryOrder }, { merge: true });
-      } catch (error) {
-        console.error('Error updating categories in Firestore:', error);
-      }
-    };
-
-    updateData();
-  }, [categories, categoryOrder]);
+    if (!serverId || !hasLoadedRef.current) return;
+    if (skipCategoriesSaveRef.current) {
+      skipCategoriesSaveRef.current = false;
+      return;
+    }
+    updateDoc(doc(db, 'data', serverId), { categories, categoryOrder }).catch((error) => {
+      console.error('Error updating categories in Firestore:', error);
+    });
+  }, [categories, categoryOrder, serverId]);
 
   // Currency Utils
   // 1 Galleon = 17 Sickles
   // 1 Sickle = 29 Knuts
   // Total Knuts = (Galleon * 17 * 29) + (Sickle * 29) + Knut
-  
+
   const toTotalKnuts = (price) => {
     const g = Number(price.galleon) || 0;
     const s = Number(price.sickle) || 0;
@@ -194,6 +188,7 @@ export const AppDataProvider = ({ children }) => {
 
   return (
     <AppDataContext.Provider value={{
+      serverId,
       ingredients, setIngredients,
       potions, setPotions,
       toTotalKnuts, toCurrencyObj,

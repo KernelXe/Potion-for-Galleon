@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA46_WyK-LTTXZzmKH7CK2wQUKINflj17U",
@@ -15,3 +16,6 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firestore
 export const db = getFirestore(app);
+
+// Initialize Auth (ใช้สำหรับ login เข้าหน้า /admin)
+export const auth = getAuth(app);

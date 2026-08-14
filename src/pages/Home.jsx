@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import PotionCard from '../components/PotionCard';
 import CartPlanner from '../components/CartPlanner';
@@ -44,18 +45,21 @@ const EmptyState = () => (
   </Card>
 );
 
-const NoPotionsState = () => (
+const NoPotionsState = ({ serverId }) => (
   <Card className="flex min-h-[200px] flex-col items-center justify-center gap-2 py-12 text-center">
     <i className="bx bx-package mb-2 text-5xl text-primary/40" />
     <h4 className="font-heading text-lg text-white">ยังไม่มีสูตรยาในระบบ</h4>
     <p className="max-w-sm text-sm text-muted-foreground">
-      ผู้ดูแลสามารถเพิ่มสูตรยาได้ที่หน้า <span className="font-mono text-foreground">/admin</span>
+      ผู้ดูแลสามารถเพิ่มสูตรยาได้ที่หน้า{' '}
+      <Link to={`/s/${serverId}/admin`} className="font-mono text-foreground underline">
+        /admin
+      </Link>
     </p>
   </Card>
 );
 
 const Home = () => {
-  const { potions, isLoading } = useAppData();
+  const { potions, isLoading, serverId } = useAppData();
   const [selectedPotionId, setSelectedPotionId] = useState('');
   const selectedPotion = potions.find((p) => p.id === selectedPotionId);
 
@@ -70,7 +74,7 @@ const Home = () => {
       {isLoading ? (
         <HomeSkeleton />
       ) : potions.length === 0 ? (
-        <NoPotionsState />
+        <NoPotionsState serverId={serverId} />
       ) : (
         <>
           <Card className="gap-4 py-6">

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Firebase service account key -- ห้ามหลุดขึ้น GitHub เด็ดขาด มีสิทธิ์เข้าถึงฐานข้อมูลเต็ม
+serviceAccountKey.json

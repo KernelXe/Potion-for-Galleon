@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// วิธีใช้ไฟล์นี้:
+// 1. เข้า https://console.firebase.google.com/ -> เลือกโปรเจกต์ potion-for-galleon-fdd46
+// 2. ไปที่เมนู Firestore Database -> แท็บ "Rules"
+// 3. ลบของเดิมทั้งหมด แล้ววางเนื้อหาไฟล์นี้แทน -> กด "Publish"
+//
+// สรุปกฎ:
+// - อ่านข้อมูล (ดูสูตรยา/วัตถุดิบ) -> เปิดให้ทุกคนอ่านได้ ไม่ต้อง login
+//   (เพราะหน้า /s/:serverId ที่ไว้ดูสูตรยา ตั้งใจให้สมาชิกเซิฟดูได้โดยไม่ต้อง login)
+// - เขียนข้อมูล (เพิ่ม/แก้/ลบ วัตถุดิบ, สูตรยา, หมวดหมู่) -> ต้อง login ผ่าน Firebase
+//   Authentication ก่อนเท่านั้น (request.auth != null) ตรงกับหน้า /admin ที่ล็อกไว้แล้ว
+//
+// เอกสารข้อมูลของแต่ละเซิฟอยู่ที่ data/<serverId> เช่น data/mooncraft, data/hogwarts
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /data/{serverId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ปฏิเสธทุกอย่างที่ไม่ตรงกับกฎด้านบน (กันเผื่อ path อื่นที่ไม่ตั้งใจให้เข้าถึง)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

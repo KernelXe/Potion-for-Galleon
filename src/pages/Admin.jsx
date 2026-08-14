@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { getCategoryMeta } from '@/lib/categoryMeta';
+import { getServerById } from '@/lib/servers';
+import { useAuth } from '@/context/AuthContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 const SectionHeader = ({ icon, title, description, count, accent = 'text-primary' }) => (
@@ -72,7 +74,18 @@ const AdminSkeleton = () => (
 );
 
 const Admin = () => {
-  const { ingredients, setIngredients, potions, setPotions, categoryOrder, setCategoryOrder, isLoading } = useAppData();
+  const { ingredients, setIngredients, potions, setPotions, categoryOrder, setCategoryOrder, isLoading, serverId } = useAppData();
+  const currentServer = getServerById(serverId);
+  const { currentUser, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('ออกจากระบบแล้ว');
+    } catch {
+      toast.error('ออกจากระบบไม่สำเร็จ');
+    }
+  };
 
   const [ingName, setIngName] = useState('');
   const [ingGalleon, setIngGalleon] = useState('');
@@ -270,10 +283,17 @@ const Admin = () => {
       <header className="space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="mb-1 text-sm font-medium text-primary">จัดการข้อมูล</p>
+            <p className="mb-1 flex items-center gap-1.5 text-sm font-medium text-primary">
+              จัดการข้อมูล
+              {currentServer && (
+                <span className="ml-1 rounded-full border border-gold/30 px-2 py-0.5 text-[11px] font-normal text-gold/80">
+                  เซิฟ {currentServer.name}
+                </span>
+              )}
+            </p>
             <h1 className="font-heading text-3xl font-bold text-white sm:text-4xl">Admin Dashboard</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-              จัดการหมวดหมู่ ส่วนผสม และสูตรยาทั้งหมดในที่เดียว
+              จัดการหมวดหมู่ ส่วนผสม และสูตรยาทั้งหมดในที่เดียว — เฉพาะของเซิฟนี้เท่านั้น
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -289,6 +309,15 @@ const Admin = () => {
               <i className="bx bx-flask text-primary" />
               {potions.length} สูตรยา
             </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <i className="bx bx-log-out text-base" />
+              {currentUser?.email ? `ออกจากระบบ (${currentUser.email})` : 'ออกจากระบบ'}
+            </Button>
           </div>
         </div>
         <Separator className="bg-border/60" />

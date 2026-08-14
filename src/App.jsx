@@ -1,8 +1,33 @@
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useParams } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import ServerSelect from './pages/ServerSelect';
+import Login from './pages/Login';
+import ServerScope from './components/ServerScope';
+import RequireAuth from './components/RequireAuth';
+import { getServerById } from '@/lib/servers';
+
+// แสดงชื่อเซิฟปัจจุบัน + ลิงก์ "เปลี่ยนเซิฟ" เฉพาะตอนที่อยู่ในหน้า /s/:serverId เท่านั้น
+const CurrentServerBadge = () => {
+  const { serverId } = useParams();
+  const server = getServerById(serverId);
+  if (!server) return null;
+
+  return (
+    <Link
+      to="/"
+      className="flex items-center gap-2 rounded-full border border-gold/30 bg-card/60 px-3 py-1.5 text-xs text-muted-foreground no-underline transition-colors hover:border-gold/50 hover:text-gold"
+    >
+      <i className="bx bx-server text-sm text-gold/70" />
+      <span className="font-heading tracking-wide text-foreground">{server.name}</span>
+      <span className="hidden items-center gap-1 sm:flex">
+        <i className="bx bx-transfer-alt text-[13px]" /> เปลี่ยนเซิฟ
+      </span>
+    </Link>
+  );
+};
 
 function App() {
   return (
@@ -42,23 +67,34 @@ function App() {
             </span>
           </Link>
 
-          <span
-            aria-hidden
-            className="hidden items-center gap-3 text-gold/45 md:flex"
-          >
-            <i className="bx bx-star text-[10px]" />
-            <span className="block h-px w-10 bg-gradient-to-r from-transparent via-gold/45 to-transparent" />
-            <i className="bxf bx-star text-sm text-gold/65" />
-            <span className="block h-px w-10 bg-gradient-to-r from-transparent via-gold/45 to-transparent" />
-            <i className="bx bx-star text-[10px]" />
-          </span>
+          <Routes>
+            <Route path="/s/:serverId/*" element={<CurrentServerBadge />} />
+          </Routes>
         </div>
       </nav>
 
       <main className="mx-auto w-full max-w-[1100px] flex-1 px-4 py-6 sm:px-6">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/" element={<ServerSelect />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/s/:serverId"
+            element={
+              <ServerScope>
+                <Home />
+              </ServerScope>
+            }
+          />
+          <Route
+            path="/s/:serverId/admin"
+            element={
+              <RequireAuth>
+                <ServerScope>
+                  <Admin />
+                </ServerScope>
+              </RequireAuth>
+            }
+          />
         </Routes>
       </main>
 
