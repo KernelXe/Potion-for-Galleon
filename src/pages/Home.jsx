@@ -49,12 +49,12 @@ const NoPotionsState = ({ serverId }) => (
   <Card className="flex min-h-[200px] flex-col items-center justify-center gap-2 py-12 text-center">
     <i className="bx bx-package mb-2 text-5xl text-primary/40" />
     <h4 className="font-heading text-lg text-white">ยังไม่มีสูตรยาในระบบ</h4>
-    <p className="max-w-sm text-sm text-muted-foreground">
+    {/* <p className="max-w-sm text-sm text-muted-foreground">
       ผู้ดูแลสามารถเพิ่มสูตรยาได้ที่หน้า{' '}
       <Link to={`/s/${serverId}/admin`} className="font-mono text-foreground underline">
         /admin
       </Link>
-    </p>
+    </p> */}
   </Card>
 );
 
