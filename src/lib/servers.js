@@ -27,7 +27,7 @@ export const SERVERS = [
   {
     id: 'server3',
     name: 'เซิฟที่ 3',
-    tagline: 'แก้ไขชื่อและรูปได้ที่ src/lib/servers.js',
+    tagline: 'Soon......',
     bgImage: '/assets/servers/server3.jpg',
     theme: 'from-emerald-950 via-teal-900/70 to-slate-950',
   },
