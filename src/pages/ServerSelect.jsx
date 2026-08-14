@@ -23,7 +23,7 @@ const ServerCard = ({ server }) => {
           alt=""
           aria-hidden
           onError={() => setImageOk(false)}
-          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-[1px] transition-transform duration-500 group-hover:scale-125"
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-[2px] transition-transform duration-500 group-hover:scale-125"
         />
       )}
 
