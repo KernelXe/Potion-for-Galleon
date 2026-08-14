@@ -11,7 +11,7 @@ const ServerCard = ({ server }) => {
   return (
     <Link
       to={`/s/${server.id}`}
-      className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:border-gold/50 sm:h-72"
+      className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:border-gold/50 sm:h-72 card-arcane"
     >
       {/* พื้นหลัง gradient สีของเซิฟ (fallback เสมอ อยู่ชั้นล่างสุด) */}
       <div className={`absolute inset-0 bg-gradient-to-br ${server.theme}`} />
@@ -23,7 +23,7 @@ const ServerCard = ({ server }) => {
           alt=""
           aria-hidden
           onError={() => setImageOk(false)}
-          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-[2px] transition-transform duration-500 group-hover:scale-125"
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-sm transition-transform duration-500 group-hover:scale-125"
         />
       )}
 
@@ -53,7 +53,7 @@ const ServerSelect = () => {
         <span className="flex items-center gap-2.5 text-gold/60">
           <i className="bx bx-flask-round text-2xl" />
         </span>
-        <h1 className="font-heading text-3xl font-bold text-white sm:text-4xl">
+        <h1 className="font-heading text-3xl font-bold text-arcane-glow sm:text-4xl">
           เลือกเซิฟเวอร์
         </h1>
         <p className="max-w-md text-sm text-muted-foreground">

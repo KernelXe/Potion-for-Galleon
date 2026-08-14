@@ -56,14 +56,14 @@ const Login = () => {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center py-10">
-      <Card className="w-full max-w-sm">
+      <Card className="card-arcane w-full max-w-sm">
         <CardHeader>
           <div className="mb-2 flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-full border border-gold/40 bg-gradient-to-br from-card via-card/80 to-background">
               <i className="bx bx-lock-alt text-lg text-gold" />
             </span>
             <div>
-              <CardTitle className="font-heading text-xl text-white">เข้าสู่ระบบผู้ดูแล</CardTitle>
+              <CardTitle className="font-heading text-xl text-arcane-glow">เข้าสู่ระบบผู้ดูแล</CardTitle>
               <CardDescription>สำหรับจัดการวัตถุดิบและสูตรยาเท่านั้น</CardDescription>
             </div>
           </div>

@@ -54,7 +54,7 @@ function App() {
 
             <span className="flex flex-col leading-tight">
               <span className="bg-gradient-to-r from-white via-gold/80 to-white bg-clip-text font-heading text-lg font-bold tracking-[0.05em] text-transparent sm:text-xl">
-                Potion for Galleon
+                Joe K Muller
               </span>
               <span className="mt-1 hidden items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-muted-foreground/80 sm:flex">
                 <span aria-hidden className="block h-px w-3 bg-gold/45" />

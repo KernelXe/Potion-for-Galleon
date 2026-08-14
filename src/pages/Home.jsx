@@ -49,12 +49,12 @@ const NoPotionsState = ({ serverId }) => (
   <Card className="flex min-h-[200px] flex-col items-center justify-center gap-2 py-12 text-center">
     <i className="bx bx-package mb-2 text-5xl text-primary/40" />
     <h4 className="font-heading text-lg text-white">ยังไม่มีสูตรยาในระบบ</h4>
-    {/* <p className="max-w-sm text-sm text-muted-foreground">
+    <p className="max-w-sm text-sm text-muted-foreground">
       ผู้ดูแลสามารถเพิ่มสูตรยาได้ที่หน้า{' '}
       <Link to={`/s/${serverId}/admin`} className="font-mono text-foreground underline">
         /admin
       </Link>
-    </p> */}
+    </p>
   </Card>
 );
 
@@ -77,7 +77,7 @@ const Home = () => {
         <NoPotionsState serverId={serverId} />
       ) : (
         <>
-          <Card className="gap-4 py-6">
+          <Card className="card-arcane gap-4 py-6">
             <CardHeader className="px-6 pb-0">
               <div className="flex items-start gap-3.5">
                 <i className="bx bx-search-alt mt-1 text-3xl text-primary" />
@@ -105,9 +105,11 @@ const Home = () => {
             />
 
             <section className="flex flex-col gap-4">
-              <h3 className="flex items-center gap-2.5 font-heading text-xl text-white">
-                <i className="bx bx-book-bookmark text-primary" /> All Potion Recipes
-              </h3>
+              <div className="ornate-divider">
+                <h3 className="flex shrink-0 items-center gap-2.5 font-heading text-xl text-white">
+                  <i className="bx bx-book-bookmark text-primary" /> All Potion Recipes
+                </h3>
+              </div>
               {selectedPotion ? (
                 <PotionCard potion={selectedPotion} />
               ) : (

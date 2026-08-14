@@ -11,7 +11,7 @@ const PotionCard = ({ potion }) => {
   const cost = calculatePotionCost(potion);
 
   return (
-    <Card className="gap-0 py-5">
+    <Card className="card-arcane gap-0 py-5">
       <CardContent className="px-5">
         <div className="flex items-start gap-5">
           {potion.image ? (

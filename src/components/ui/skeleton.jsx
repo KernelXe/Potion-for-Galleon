@@ -7,7 +7,11 @@ function Skeleton({
   return (
     <div
       data-slot="skeleton"
-      className={cn("animate-pulse rounded-md bg-accent", className)}
+      className={cn(
+        "relative overflow-hidden rounded-md bg-accent",
+        "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.8s_infinite] before:bg-gradient-to-r before:from-transparent before:via-gold/12 before:to-transparent",
+        className
+      )}
       {...props} />
   );
 }
