@@ -1,17 +1,40 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { SERVERS } from '@/lib/servers';
 
 // การ์ดของแต่ละเซิฟ: มีรูปพื้นหลัง (เบลอ) + gradient สีสำรอง + ชื่อเซิฟทับด้านหน้า
 // ถ้าไม่มีไฟล์รูปที่ path ที่กำหนด (หรือโหลดไม่ขึ้น) จะไม่แสดงรูปแตก ๆ
 // แต่จะเหลือแค่พื้น gradient สีของเซิฟนั้นแทนโดยอัตโนมัติ
+const TILT_MAX_DEG = 6;
+
 const ServerCard = ({ server }) => {
   const [imageOk, setImageOk] = useState(Boolean(server.bgImage));
+  const cardRef = useRef(null);
+
+  // เอียงการ์ดตามตำแหน่งเมาส์เล็กน้อย (tilt 3D) ให้ความรู้สึกมีมิติตอน hover
+  const handleMouseMove = (e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(800px) rotateX(${(-py * TILT_MAX_DEG).toFixed(2)}deg) rotateY(${(px * TILT_MAX_DEG).toFixed(2)}deg) translateY(-4px)`;
+  };
+
+  const handleMouseLeave = () => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transform = '';
+  };
 
   return (
     <Link
+      ref={cardRef}
       to={`/s/${server.id}`}
-      className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 hover:-translate-y-1 hover:border-gold/50 sm:h-72 card-arcane"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
+      className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 ease-out hover:border-gold/50 sm:h-72 card-arcane"
     >
       {/* พื้นหลัง gradient สีของเซิฟ (fallback เสมอ อยู่ชั้นล่างสุด) */}
       <div className={`absolute inset-0 bg-gradient-to-br ${server.theme}`} />
@@ -33,7 +56,7 @@ const ServerCard = ({ server }) => {
       {/* กรอบเรืองแสงตอน hover */}
       <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[inset_0_0_40px_oklch(0.76_0.12_85/0.25)] transition-opacity duration-300 group-hover:opacity-100" />
 
-      <div className="relative flex flex-col gap-1.5 p-5 sm:p-6">
+      <div className="relative flex flex-col gap-1.5 p-5 sm:p-6" style={{ transform: 'translateZ(30px)' }}>
         <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-gold/70">
           <i className="bx bx-server text-xs" /> Server
         </span>
@@ -61,7 +84,7 @@ const ServerSelect = () => {
         </p>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" style={{ perspective: '1000px' }}>
         {SERVERS.map((server) => (
           <ServerCard key={server.id} server={server} />
         ))}

@@ -1,42 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import PotionCard from '../components/PotionCard';
 import CartPlanner from '../components/CartPlanner';
 import InventoryCalculator from '../components/InventoryCalculator';
 import PotionSelector from '../components/PotionSelector';
+import CauldronLoader from '../components/CauldronLoader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { APP_VERSION } from '@/lib/version';
-
-const HomeSkeleton = () => (
-  <div className="space-y-6">
-    <Card className="gap-4 py-6">
-      <CardHeader className="px-6 pb-0">
-        <div className="flex items-start gap-3.5">
-          <Skeleton className="size-9 rounded-md" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-5 w-48" />
-            <Skeleton className="h-4 w-72 max-w-full" />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 px-6">
-        <Skeleton className="h-10 w-full" />
-        <div className="flex flex-wrap gap-1.5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-24 rounded-full" />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Skeleton className="h-72 rounded-xl" />
-      <Skeleton className="h-72 rounded-xl" />
-    </div>
-    <Skeleton className="h-96 rounded-xl" />
-  </div>
-);
 
 const EmptyState = () => (
   <Card className="flex min-h-[280px] flex-col items-center justify-center py-16 text-center text-muted-foreground">
@@ -45,21 +15,15 @@ const EmptyState = () => (
   </Card>
 );
 
-const NoPotionsState = ({ serverId }) => (
+const NoPotionsState = () => (
   <Card className="flex min-h-[200px] flex-col items-center justify-center gap-2 py-12 text-center">
     <i className="bx bx-package mb-2 text-5xl text-primary/40" />
     <h4 className="font-heading text-lg text-white">ยังไม่มีสูตรยาในระบบ</h4>
-    <p className="max-w-sm text-sm text-muted-foreground">
-      ผู้ดูแลสามารถเพิ่มสูตรยาได้ที่หน้า{' '}
-      <Link to={`/s/${serverId}/admin`} className="font-mono text-foreground underline">
-        /admin
-      </Link>
-    </p>
   </Card>
 );
 
 const Home = () => {
-  const { potions, isLoading, serverId } = useAppData();
+  const { potions, isLoading } = useAppData();
   const [selectedPotionId, setSelectedPotionId] = useState('');
   const selectedPotion = potions.find((p) => p.id === selectedPotionId);
 
@@ -72,9 +36,9 @@ const Home = () => {
       </div>
 
       {isLoading ? (
-        <HomeSkeleton />
+        <CauldronLoader />
       ) : potions.length === 0 ? (
-        <NoPotionsState serverId={serverId} />
+        <NoPotionsState />
       ) : (
         <>
           <Card className="card-arcane gap-4 py-6">

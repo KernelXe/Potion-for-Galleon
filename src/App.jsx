@@ -7,6 +7,7 @@ import ServerSelect from './pages/ServerSelect';
 import Login from './pages/Login';
 import ServerScope from './components/ServerScope';
 import RequireAuth from './components/RequireAuth';
+import ArcaneBackdrop from './components/ArcaneBackdrop';
 import { getServerById } from '@/lib/servers';
 
 // แสดงชื่อเซิฟปัจจุบัน + ลิงก์ "เปลี่ยนเซิฟ" เฉพาะตอนที่อยู่ในหน้า /s/:serverId เท่านั้น
@@ -31,7 +32,8 @@ const CurrentServerBadge = () => {
 
 function App() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
+      <ArcaneBackdrop />
       <nav className="sticky top-0 z-50">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/90 to-background/75 backdrop-blur-xl" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/35 to-transparent" />
@@ -48,7 +50,10 @@ function App() {
                 className="absolute inset-0 rounded-full bg-gradient-to-br from-gold/35 via-primary/20 to-transparent opacity-50 blur-lg transition-opacity duration-500 group-hover:opacity-90"
               />
               <span className="relative flex size-11 items-center justify-center rounded-full border border-gold/40 bg-gradient-to-br from-card via-card/80 to-background shadow-[inset_0_1px_0_0_oklch(0.76_0.12_85/0.2)]">
-                <i className="bx bx-flask-round text-[22px] text-gold transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-110" />
+                <span className="absolute inset-[3px] rounded-full border border-gold/25" />
+                <span className="relative bg-gradient-to-br from-[oklch(0.88_0.08_90)] via-gold to-[oklch(0.55_0.1_75)] bg-clip-text font-heading text-[13px] font-bold tracking-[0.04em] text-transparent transition-transform duration-500 group-hover:scale-110">
+                  JKM
+                </span>
               </span>
             </span>
 
@@ -73,7 +78,7 @@ function App() {
         </div>
       </nav>
 
-      <main className="mx-auto w-full max-w-[1100px] flex-1 px-4 py-6 sm:px-6">
+      <main className="relative z-10 mx-auto w-full max-w-[1100px] flex-1 px-4 py-6 sm:px-6">
         <Routes>
           <Route path="/" element={<ServerSelect />} />
           <Route path="/login" element={<Login />} />
