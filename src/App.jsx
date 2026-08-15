@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link, useParams } from 'react-router-dom';
+import { Routes, Route, Link, useParams, useLocation } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
@@ -31,6 +31,8 @@ const CurrentServerBadge = () => {
 };
 
 function App() {
+  const location = useLocation();
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <ArcaneBackdrop />
@@ -58,7 +60,7 @@ function App() {
             </span>
 
             <span className="flex flex-col leading-tight">
-              <span className="bg-gradient-to-r from-white via-gold/80 to-white bg-clip-text font-heading text-lg font-bold tracking-[0.05em] text-transparent sm:text-xl">
+              <span className="link-ink bg-gradient-to-r from-white via-gold/80 to-white bg-clip-text font-heading text-lg font-bold tracking-[0.05em] text-transparent sm:text-xl">
                 Joe K Muller
               </span>
               <span className="mt-1 hidden items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-muted-foreground/80 sm:flex">
@@ -79,28 +81,30 @@ function App() {
       </nav>
 
       <main className="relative z-10 mx-auto w-full max-w-[1100px] flex-1 px-4 py-6 sm:px-6">
-        <Routes>
-          <Route path="/" element={<ServerSelect />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/s/:serverId"
-            element={
-              <ServerScope>
-                <Home />
-              </ServerScope>
-            }
-          />
-          <Route
-            path="/s/:serverId/admin"
-            element={
-              <RequireAuth>
+        <div key={location.pathname} className="page-transition">
+          <Routes>
+            <Route path="/" element={<ServerSelect />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/s/:serverId"
+              element={
                 <ServerScope>
-                  <Admin />
+                  <Home />
                 </ServerScope>
-              </RequireAuth>
-            }
-          />
-        </Routes>
+              }
+            />
+            <Route
+              path="/s/:serverId/admin"
+              element={
+                <RequireAuth>
+                  <ServerScope>
+                    <Admin />
+                  </ServerScope>
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </div>
       </main>
 
       <footer className="relative mt-auto">

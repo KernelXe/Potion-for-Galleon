@@ -22,11 +22,37 @@ const Sigil = ({ className }) => (
   </svg>
 );
 
-const ArcaneBackdrop = () => (
-  <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden text-gold">
-    <Sigil className="absolute -left-40 -top-40 size-[560px] opacity-[0.05] sm:size-[680px]" />
-    <Sigil className="absolute -bottom-56 -right-40 size-[520px] opacity-[0.04] sm:size-[640px]" />
-  </div>
-);
+const ArcaneBackdrop = () => {
+  // สุ่มตำแหน่ง/ความเร็ว/ดีเลย์ของฝุ่นแสงแต่ละจุดครั้งเดียวตอน mount (ไม่สุ่มใหม่ทุก re-render)
+  const motes = Array.from({ length: 10 }).map((_, i) => ({
+    id: i,
+    left: `${(i * 9.7) % 100}%`,
+    duration: `${18 + (i % 5) * 3}s`,
+    delay: `${-(i * 2.3)}s`,
+    opacity: 0.35 + (i % 4) * 0.1,
+  }));
+
+  return (
+    <>
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden text-gold">
+        <Sigil className="absolute -left-40 -top-40 size-[560px] opacity-[0.05] sm:size-[680px]" />
+        <Sigil className="absolute -bottom-56 -right-40 size-[520px] opacity-[0.04] sm:size-[640px]" />
+        {motes.map((m) => (
+          <span
+            key={m.id}
+            className="dust-mote"
+            style={{
+              left: m.left,
+              animationDuration: m.duration,
+              animationDelay: m.delay,
+              '--dust-opacity': m.opacity,
+            }}
+          />
+        ))}
+      </div>
+      <div className="grain-overlay" aria-hidden />
+    </>
+  );
+};
 
 export default ArcaneBackdrop;

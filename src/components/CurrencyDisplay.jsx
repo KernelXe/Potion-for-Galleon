@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import CountUp from './CountUp';
 
 const CurrencyDisplay = ({ price, className }) => {
   if (!price) return <span>ฟรี</span>;
@@ -11,19 +12,19 @@ const CurrencyDisplay = ({ price, className }) => {
       {galleon > 0 && (
         <span className="flex items-center">
           <span className="currency-icon icon-galleon">G</span>
-          <span className="text-gold">{galleon}</span>
+          <span className="text-gold"><CountUp value={galleon} /></span>
         </span>
       )}
       {sickle > 0 && (
         <span className="flex items-center">
           <span className="currency-icon icon-sickle">S</span>
-          <span className="text-[#e9ecef]">{sickle}</span>
+          <span className="text-[#e9ecef]"><CountUp value={sickle} /></span>
         </span>
       )}
       {knut > 0 && (
         <span className="flex items-center">
           <span className="currency-icon icon-knut">K</span>
-          <span className="text-[#d98a5f]">{knut}</span>
+          <span className="text-[#d98a5f]"><CountUp value={knut} /></span>
         </span>
       )}
       {galleon === 0 && sickle === 0 && knut === 0 && <span>0</span>}
