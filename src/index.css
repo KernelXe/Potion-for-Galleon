@@ -29,6 +29,17 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes card-fade-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sparkle-burst {
+  0% { transform: rotate(var(--sparkle-angle)) translateX(0) scale(0); opacity: 1; }
+  65% { opacity: 1; }
+  100% { transform: rotate(var(--sparkle-angle)) translateX(var(--sparkle-distance)) scale(1); opacity: 0; }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -333,6 +344,25 @@
 /* เอฟเฟกต์ fade เข้าตอนเปลี่ยนหน้า/สลับเซิฟ */
 .page-transition {
   animation: page-fade-in 0.35s ease both;
+}
+
+/* การ์ดไล่ fade เข้าทีละใบ (stagger) ใช้ร่วมกับ --stagger-delay inline style */
+.stagger-fade {
+  animation: card-fade-in 0.5s ease both;
+  animation-delay: var(--stagger-delay, 0s);
+}
+
+/* อนุภาคประกายทองตอน celebrate() ถูกเรียก (บันทึก/เพิ่ม/ลบสำเร็จ) */
+.sparkle-particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: oklch(0.85 0.13 88);
+  box-shadow: 0 0 6px 2px oklch(0.82 0.13 85 / 0.7);
+  animation: sparkle-burst 0.85s ease-out forwards;
 }
 
 /* กล่องยืนยัน (AlertDialog) ให้เข้าธีมทอง */

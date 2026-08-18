@@ -7,12 +7,14 @@ import { SERVERS } from '@/lib/servers';
 // แต่จะเหลือแค่พื้น gradient สีของเซิฟนั้นแทนโดยอัตโนมัติ
 const TILT_MAX_DEG = 6;
 
-const ServerCard = ({ server }) => {
+const ServerCard = ({ server, index = 0 }) => {
   const [imageOk, setImageOk] = useState(Boolean(server.bgImage));
   const cardRef = useRef(null);
+  const isComingSoon = Boolean(server.comingSoon);
 
   // เอียงการ์ดตามตำแหน่งเมาส์เล็กน้อย (tilt 3D) ให้ความรู้สึกมีมิติตอน hover
   const handleMouseMove = (e) => {
+    if (isComingSoon) return;
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -27,14 +29,18 @@ const ServerCard = ({ server }) => {
     card.style.transform = '';
   };
 
+  const CardWrapper = isComingSoon ? 'div' : Link;
+
   return (
-    <Link
+    <CardWrapper
       ref={cardRef}
-      to={`/s/${server.id}`}
+      {...(isComingSoon ? {} : { to: `/s/${server.id}` })}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transformStyle: 'preserve-3d', willChange: 'transform' }}
-      className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 ease-out hover:border-gold/50 sm:h-72 card-arcane"
+      style={{ transformStyle: 'preserve-3d', willChange: 'transform', '--stagger-delay': `${index * 90}ms` }}
+      className={`group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-gold/25 no-underline shadow-lg transition-transform duration-300 ease-out sm:h-72 card-arcane stagger-fade ${
+        isComingSoon ? 'cursor-not-allowed grayscale' : 'hover:border-gold/50'
+      }`}
     >
       {/* พื้นหลัง gradient สีของเซิฟ (fallback เสมอ อยู่ชั้นล่างสุด) */}
       <div className={`absolute inset-0 bg-gradient-to-br ${server.theme}`} />
@@ -46,15 +52,26 @@ const ServerCard = ({ server }) => {
           alt=""
           aria-hidden
           onError={() => setImageOk(false)}
-          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-[2px] transition-transform duration-500 group-hover:scale-125"
+          className={`absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-[2px] transition-transform duration-500 ${!isComingSoon && 'group-hover:scale-125'}`}
         />
       )}
 
       {/* เฉดมืดด้านล่างให้ตัวอักษรอ่านง่าย */}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
-      {/* กรอบเรืองแสงตอน hover */}
-      <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[inset_0_0_40px_oklch(0.76_0.12_85/0.25)] transition-opacity duration-300 group-hover:opacity-100" />
+      {isComingSoon ? (
+        <>
+          {/* เฉดมืดเพิ่มทั้งการ์ดให้ดูปิดใช้งานชัดเจน */}
+          <div className="absolute inset-0 bg-background/55" />
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="flex items-center gap-2 rounded-full border border-gold/30 bg-background/70 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold/80">
+              <i className="bx bx-lock-alt text-sm" /> เร็วๆ นี้
+            </span>
+          </div>
+        </>
+      ) : (
+        <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 shadow-[inset_0_0_40px_oklch(0.76_0.12_85/0.25)] transition-opacity duration-300 group-hover:opacity-100" />
+      )}
 
       <div className="relative flex flex-col gap-1.5 p-5 sm:p-6" style={{ transform: 'translateZ(30px)' }}>
         <span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.28em] text-gold/70">
@@ -65,7 +82,7 @@ const ServerCard = ({ server }) => {
         </h2>
         <p className="text-sm text-muted-foreground/90">{server.tagline}</p>
       </div>
-    </Link>
+    </CardWrapper>
   );
 };
 
@@ -85,8 +102,8 @@ const ServerSelect = () => {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" style={{ perspective: '1000px' }}>
-        {SERVERS.map((server) => (
-          <ServerCard key={server.id} server={server} />
+        {SERVERS.map((server, index) => (
+          <ServerCard key={server.id} server={server} index={index} />
         ))}
       </div>
     </div>

@@ -9,7 +9,7 @@ const ServerScope = ({ children }) => {
   const { serverId } = useParams();
   const server = getServerById(serverId);
 
-  if (!server) {
+  if (!server || server.comingSoon) {
     return <Navigate to="/" replace />;
   }
 

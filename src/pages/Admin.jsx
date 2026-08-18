@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { celebrate } from '@/lib/celebrate';
 import { useAppData } from '../context/AppDataContext';
 import NumberSliderInput, { parseNumber } from '../components/NumberSliderInput';
 import { Button } from '@/components/ui/button';
@@ -123,10 +124,10 @@ const Admin = () => {
 
     if (editingIngredientId) {
       setIngredients(ingredients.map((i) => (i.id === editingIngredientId ? { ...i, name: ingName, price } : i)));
-      toast.success('บันทึกส่วนผสมสำเร็จ');
+      celebrate('บันทึกส่วนผสมสำเร็จ');
     } else {
       setIngredients([...ingredients, { id: `i${Date.now()}`, name: ingName, price }]);
-      toast.success('เพิ่มส่วนผสมสำเร็จ');
+      celebrate('เพิ่มส่วนผสมสำเร็จ');
     }
 
     resetIngredientForm();
@@ -136,7 +137,7 @@ const Admin = () => {
     const removed = ingredients.find((i) => i.id === id);
     setIngredients(ingredients.filter((i) => i.id !== id));
     if (editingIngredientId === id) resetIngredientForm();
-    toast.success(removed ? `ลบ "${removed.name}" แล้ว` : 'ลบส่วนผสมสำเร็จ');
+    celebrate(removed ? `ลบ "${removed.name}" แล้ว` : 'ลบส่วนผสมสำเร็จ');
   };
 
   const addPotionIng = () => {
@@ -152,7 +153,7 @@ const Admin = () => {
     const ing = ingredients.find((i) => i.id === tempIngId);
     setPotSelectedIngs([...potSelectedIngs, { id: tempIngId, quantity: qty }]);
     setTempIngQty('');
-    toast.success(ing ? `เพิ่ม ${ing.name} x${qty}` : 'เพิ่มส่วนผสมในสูตรแล้ว');
+    celebrate(ing ? `เพิ่ม ${ing.name} x${qty}` : 'เพิ่มส่วนผสมในสูตรแล้ว');
   };
 
   const removePotionIng = (idxToRemove) => {
@@ -212,7 +213,7 @@ const Admin = () => {
         )
       );
       cancelEditPotion();
-      toast.success('บันทึกสูตรยาสำเร็จ');
+      celebrate('บันทึกสูตรยาสำเร็จ');
     } else {
       const newPotion = {
         id: `p${Date.now()}`,
@@ -224,14 +225,14 @@ const Admin = () => {
       };
       setPotions([...potions, newPotion]);
       cancelEditPotion();
-      toast.success('สร้างสูตรยาสำเร็จ');
+      celebrate('สร้างสูตรยาสำเร็จ');
     }
   };
 
   const removePotion = (id) => {
     const removed = potions.find((p) => p.id === id);
     setPotions(potions.filter((p) => p.id !== id));
-    toast.success(removed ? `ลบ "${removed.name}" แล้ว` : 'ลบสูตรยาสำเร็จ');
+    celebrate(removed ? `ลบ "${removed.name}" แล้ว` : 'ลบสูตรยาสำเร็จ');
   };
 
   const addCategory = () => {
@@ -246,12 +247,12 @@ const Admin = () => {
     }
     setCategoryOrder([...categoryOrder, name]);
     setNewCategory('');
-    toast.success(`เพิ่มหมวดหมู่ "${name}" แล้ว`);
+    celebrate(`เพิ่มหมวดหมู่ "${name}" แล้ว`);
   };
 
   const removeCategory = (category) => {
     setCategoryOrder(categoryOrder.filter((c) => c !== category));
-    toast.success(`ลบหมวดหมู่ "${category}" แล้ว`);
+    celebrate(`ลบหมวดหมู่ "${category}" แล้ว`);
   };
 
   const moveCategory = (index, direction) => {

@@ -8,6 +8,9 @@
 //                 ถ้าไม่ใส่ หรือรูปหาไม่เจอ ระบบจะ fallback ไปใช้ gradient สีของ "theme" แทนอัตโนมัติ
 // - theme         ชุดสี gradient ใช้ตอนไม่มี bgImage (หรือรูปโหลดไม่ขึ้น)
 //
+// - comingSoon    (ไม่บังคับ) true = เซิฟยังไม่เปิดใช้งานจริง การ์ดจะแสดงเป็นสถานะ "เร็วๆ นี้"
+//                 กดเข้าไม่ได้ (กันสับสน ไม่ให้เข้าไปเจอฐานข้อมูลว่างเปล่าของเซิฟที่ยังไม่มีจริง)
+//
 // ต้องการเพิ่ม/แก้ไขเซิฟเวอร์ -> แก้ที่ array นี้ที่เดียว หน้าเลือกเซิฟจะอัปเดตให้เองอัตโนมัติ
 export const SERVERS = [
   {
@@ -26,10 +29,11 @@ export const SERVERS = [
   },
   {
     id: 'server3',
-    name: 'เซิฟที่ 3',
-    tagline: 'แก้ไขชื่อและรูปได้ที่ src/lib/servers.js',
+    name: 'Soon',
+    tagline: 'เซิฟใหม่ เปิดให้ใช้งานเร็วๆ นี้',
     bgImage: '/assets/servers/server3.jpg',
     theme: 'from-emerald-950 via-teal-900/70 to-slate-950',
+    comingSoon: true,
   },
 ];
 

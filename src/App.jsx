@@ -8,6 +8,8 @@ import Login from './pages/Login';
 import ServerScope from './components/ServerScope';
 import RequireAuth from './components/RequireAuth';
 import ArcaneBackdrop from './components/ArcaneBackdrop';
+import SparkleLayer from './components/SparkleLayer';
+import NotFound from './pages/NotFound';
 import { getServerById } from '@/lib/servers';
 
 // แสดงชื่อเซิฟปัจจุบัน + ลิงก์ "เปลี่ยนเซิฟ" เฉพาะตอนที่อยู่ในหน้า /s/:serverId เท่านั้น
@@ -36,6 +38,7 @@ function App() {
   return (
     <div className="relative flex min-h-screen flex-col">
       <ArcaneBackdrop />
+      <SparkleLayer />
       <nav className="sticky top-0 z-50">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/90 to-background/75 backdrop-blur-xl" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold/35 to-transparent" />
@@ -103,6 +106,7 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </main>
